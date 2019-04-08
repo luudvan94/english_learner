@@ -19,7 +19,7 @@ class DartSet1 {
   }
 
   Color get definition {
-    return Color.fromRGBO(114, 140, 0, 1)
+    return Color.fromRGBO(114, 140, 0, 1);
   }
 
   Color get example {

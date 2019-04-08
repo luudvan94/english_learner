@@ -22,7 +22,7 @@ class ElementStyle {
       style: TextStyle(
         color: Appearance.currentSet.pronounce,
         decoration: TextDecoration.none,
-        fontFamily: 'Verdana',
+        fontFamily: 'Railway',
         fontSize: 15.0
       ),
     );
@@ -35,7 +35,7 @@ class ElementStyle {
     TextStyle normal = new TextStyle(
           color: Appearance.currentSet.example,
           decoration: TextDecoration.none,
-          fontFamily: 'Monaco',
+          fontFamily: 'Open Sans Condensed',
           fontSize: 14.0,
           fontWeight: FontWeight.w100
     );

@@ -7,7 +7,6 @@ class WordContent extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _WordContentState();
   }
 }
@@ -119,7 +118,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
                 flex: 1,
                 child: Container(
                   alignment: Alignment.topCenter,
-                  child: ElementStyle.pronounce('/r\u00e6\u0283/'),
+                  child: ElementStyle.pronounce('/k\u00e6mp\u0259s/'),
                 ),
               ),
               // SizedBox(height: 10),

@@ -25,10 +25,13 @@ dependencies:
   cupertino_icons: ^0.1.2
   rxdart: ^0.18.0
   http: ^0.12.0+1
+  sqflite: any
+  path_provider: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: 4.0.0
 
 
 # For information on the generic Dart part of this file, see the
@@ -53,11 +56,15 @@ flutter:
 
     - family: Open Sans Condensed
       fonts: 
-        - asset: OpenSansCondensed-Bold.ttf
-        - asset: OpenSansCondensed-Light.ttf
+        - asset: fonts/OpenSansCondensed-Bold.ttf
+        - asset: fonts/OpenSansCondensed-Light.ttf
           style: normal
-        - asset: OpenSansCondensed-LightItalic.ttf
+        - asset: fonts/OpenSansCondensed-LightItalic.ttf
           style: italic
+
+    - family: Railway
+      fonts:
+        - asset: fonts/Raleway-Thin.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
