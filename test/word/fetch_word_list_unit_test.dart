@@ -19,7 +19,19 @@ main() {
 
       when(client.get(AppConfig.API_URL)).thenAnswer((_) async => Response(MockingData.WORD, 200));
 
-      expect(await apiProvider.fetchWordList(client), isInstanceOf<Word>());
+      Word word =await apiProvider.fetchWordList(client);
+      expect(word, isInstanceOf<Word>());
+      expect(word.name, "aspirin");
+      expect(word.typeWord, "noun");
+      expect(word.topic, "health");
+      expect(word.id, 1);
+
+      assert(word.definitions.length > 0);
+      expect(word.definitions.first.wordId, word.id);
+
+      var definition = word.definitions.first;
+      assert(definition.examples.length > 0);
+      expect(definition.examples.first.definitionId, definition.id);
     });
 
     test('throws an exception if the http call completes with an error', () {
