@@ -16,13 +16,14 @@ enum Direction {
 class WordContent extends StatefulWidget {
 
 
-  WordContent({this.word, this.colorSet, this.nextWord, this.previousWord}): currentPage = 0, numberOfPage = word.definitions.length + 1;
+  WordContent({this.word, this.colorSet, this.nextWord, this.previousWord, this.playSound}): currentPage = 0, numberOfPage = word.definitions.length + 1;
 
   final Word word;
   final ColorSet colorSet;
 
   final VoidCallback nextWord;
   final VoidCallback previousWord;
+  VoidCallback playSound;
 
   int currentPage;
   int numberOfPage;
@@ -40,15 +41,13 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
   Offset startPoint;
   bool dragFromRight;
 
-
-
   //ANIMATION
   AnimationController _controller;
   Animation<Offset> _animation;
   Animation _curve;
 
   // PAGE VIEW
-  PageController _pageController =PageController(initialPage: 0, keepPage: false);
+  PageController _pageController;
 
 
   @override
@@ -56,6 +55,8 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
     super.initState();
     controlPoint = Offset(0, 0);
     dragFromRight = false;
+
+    _pageController =PageController(initialPage: 0, keepPage: false);
   }
 
   Direction shouldChange(Offset startPoint, Offset currentPoint) {
@@ -91,38 +92,9 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
 
   }
 
-  _handleChange(Direction direction) {
-    switch (direction) {
-      case Direction.nextPage:
-      // print("next Page");
-      this.nextPage();
-      return;
-
-      case Direction.previousPage:
-      // print("previous Page");
-      this.previousPage();
-      return;
-
-      case Direction.nextWord:
-      // print("next word");
-      _pageController.jumpTo(0);
-      widget.nextWord();
-      return;
-
-      case Direction.previousWord:
-      // print("previous word");
-      _pageController.jumpTo(0);
-      widget.previousWord();
-      return;
-
-      default:
-      return;
-    }
-  }
-
-  void _handleDragStart(ForcePressDetails details) {
+  void _handleDragStart(DragStartDetails details) {
     // debugPrint("drag start");
-
+    // timerCount = 1;
     double width = MediaQuery.of(context).size.width;
     startPoint =details.globalPosition;
     double dx = details.globalPosition.dx;
@@ -142,19 +114,23 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
     }
   }
 
-  void _handleDragUpdate(ForcePressDetails details) {
+  void _handleDragUpdate(DragUpdateDetails details) {
     // debugPrint("drag update");
 
     double dxOffset = details.globalPosition.dx - prevPoint.dx;
-    setState(() {
-      prevPoint = details.globalPosition;
-      controlPoint = Offset(controlPoint.dx + dxOffset, details.globalPosition.dy);
-    });
+
+      setState(() {
+        prevPoint = details.globalPosition;
+        controlPoint = Offset(controlPoint.dx + dxOffset, details.globalPosition.dy);
+      });
+    // }
+    
 
   }
 
-  void _handleDragEnd(ForcePressDetails details) {
-    // debugPrint("drag end");
+  void _handleDragEnd(DragEndDetails details) {
+    debugPrint("drag end");
+    
     Offset endPoint;
     Size size = MediaQuery.of(context).size;
     if (dragFromRight) {
@@ -183,6 +159,29 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
     _handleChange(rs);
   }
 
+  _handleChange(Direction direction) {
+    switch (direction) {
+
+      case Direction.nextWord:
+      // print("next word");
+      _pageController.jumpTo(0);
+      widget.nextWord();
+      return;
+
+      case Direction.previousWord:
+      // print("previous word");
+      _pageController.jumpTo(0);
+      widget.previousWord();
+      return;
+
+      default:
+      return;
+    }
+  }
+
+  void _handleLongPress(GestureLongPressDragStartDetails details) {
+    widget.playSound();
+  }
   Container firstPageView(Word word) {
 
     content() {
@@ -308,27 +307,15 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
 
     return listPages;
   }
-
-  nextPage() {
-    
-    widget.currentPage =widget.currentPage < widget.numberOfPage - 1 ? widget.currentPage + 1 :widget.numberOfPage - 1;
-    
-    _pageController.jumpToPage(widget.currentPage);
-    
-  }
-
-  previousPage() {
-    widget.currentPage =widget.currentPage > 0 ? widget.currentPage - 1 :0;
-    _pageController.jumpToPage(widget.currentPage);
-  }
   
   @override
   Widget build(BuildContext context) {
 
     return GestureDetector(
-      onForcePressStart: this._handleDragStart,
-      onForcePressUpdate: this._handleDragUpdate,
-      onForcePressEnd: this._handleDragEnd,
+      onLongPressDragStart: this._handleLongPress,
+      onPanStart: this._handleDragStart,
+      onPanUpdate: this._handleDragUpdate,
+      onPanEnd: this._handleDragEnd,
       child: ClipPath(
         child: Container(
           padding: MediaQuery.of(context).padding,
@@ -350,6 +337,11 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
                 Expanded(
                   flex: 1,
                   child:  PageView(
+                    onPageChanged: (currentPage) {
+                      setState(() {
+                        widget.currentPage =currentPage;
+                      });
+                    },
                     controller: _pageController,
                     scrollDirection: Axis.vertical,
                     children: listPages(),
