@@ -1,4 +1,4 @@
 class AppConfig {
 
-  static final API_URL = "http://localhost:8080/words";
+  static final API_URL = "https://peaceful-anchorage-27502.herokuapp.com/words";
 }

@@ -11,6 +11,7 @@ class Word {
   static final COLUMN_TYPE_WORD = "type_word";
   static final COLUMN_PRONOUNCE = "pronounce";
   static final COLUMN_AUDIO_LINK = "audio_link";
+  // static final COLUMN_IMAGE_LINK = "image_link";
   static final COLUMN_LINK = "link";
   static final COLUMN_TOPIC_ID = "topic_id";
 
@@ -21,6 +22,7 @@ class Word {
       COLUMN_TYPE_WORD:_type_word,
       COLUMN_PRONOUNCE:_pronounce,
       COLUMN_AUDIO_LINK:_audio_link,
+      // COLUMN_IMAGE_LINK:_image_link,
       COLUMN_LINK:_link,
       COLUMN_TOPIC_ID:_topic.id,
     };
@@ -34,6 +36,7 @@ class Word {
     _type_word =map[COLUMN_TYPE_WORD];
     _pronounce =map[COLUMN_PRONOUNCE];
     _audio_link =map[COLUMN_AUDIO_LINK];
+    // _image_link =map[COLUMN_IMAGE_LINK];
     _link =map[COLUMN_LINK];
   }
 
@@ -42,6 +45,7 @@ class Word {
   String _type_word;
   String _pronounce;
   String _audio_link;
+  String _image_link;
   String _link;
   Topic _topic;
   List<Definition> _definitions = new List();
@@ -52,6 +56,7 @@ class Word {
     _type_word =parsedJson['typeWord'];
     _pronounce =parsedJson['pronounce'];
     _audio_link =parsedJson['audioLink'];
+    // _image_link =parsedJson['imageLink'];
     _link =parsedJson['link'];
     _topic =Topic.fromJson(parsedJson['topic']);
 
@@ -75,6 +80,8 @@ class Word {
     _definitions =temp;
   }
 
+  Word() {}
+
   int get id {
     return _id;
   }
@@ -97,6 +104,10 @@ class Word {
 
   String get audioLink {
     return _audio_link;
+  }
+
+  String get imageLink {
+    return _image_link;
   }
 
   List<Definition> get definitions {

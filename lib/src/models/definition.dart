@@ -2,7 +2,7 @@ import 'example.dart';
 
 class Definition {
 
-  static final TABLE_WORD = "definition";
+  static final TABLE_NAME = "definition";
   static final COLUMN_ID = "id";
   static final COLUMN_DEFI = "defi";
   static final COLUMN_WORD_ID = "word_id";
@@ -45,6 +45,10 @@ class Definition {
 
   int get wordId {
     return this._wordId;
+  }
+
+  String get definition {
+    return _defi;
   }
 
   List<Example> get examples {

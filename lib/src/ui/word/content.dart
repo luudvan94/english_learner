@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../common/appearance.dart';
+import '../../models/word.dart';
+import '../../models/definition.dart';
+import 'package:flutter/scheduler.dart';
 import '../../common/element_style.dart';
 
+enum Direction {
+  nextPage,
+  previousPage,
+  nextWord,
+  previousWord,
+  none
+}
 
 class WordContent extends StatefulWidget {
+
+
+  WordContent({this.word, this.colorSet, this.nextWord, this.previousWord}): currentPage = 0, numberOfPage = word.definitions.length + 1;
+
+  final Word word;
+  final ColorSet colorSet;
+
+  final VoidCallback nextWord;
+  final VoidCallback previousWord;
+
+  int currentPage;
+  int numberOfPage;
 
   @override
   State<StatefulWidget> createState() {
@@ -15,26 +37,96 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
 
   Offset controlPoint;
   Offset prevPoint;
+  Offset startPoint;
   bool dragFromRight;
+
+
 
   //ANIMATION
   AnimationController _controller;
   Animation<Offset> _animation;
   Animation _curve;
 
+  // PAGE VIEW
+  PageController _pageController =PageController(initialPage: 0, keepPage: false);
+
+
   @override
   void initState() {
     super.initState();
     controlPoint = Offset(0, 0);
     dragFromRight = false;
+  }
 
+  Direction shouldChange(Offset startPoint, Offset currentPoint) {
+    double alPhaX =currentPoint.dx - startPoint.dx;
+    double alPhaY =currentPoint.dy - startPoint.dy;
+
+    if (alPhaX.abs() > alPhaY.abs()*2) {
+      
+      if (this.dragFromRight) {
+      
+        if (startPoint.dx < controlPoint.dx) {
+          return Direction.none;
+        }
+
+        return alPhaX.abs() >= MediaQuery.of(context).size.width/5 ? Direction.nextWord :Direction.none;
+      } else {
+
+        if (startPoint.dx > controlPoint.dx) {
+          return Direction.none;
+        }
+        
+        return currentPoint.dx >= MediaQuery.of(context).size.width/5 ? Direction.previousWord :Direction.none;
+      }
+    }
     
+    if (alPhaY < 0 && alPhaY.abs() > MediaQuery.of(context).size.height/10) {
+      return Direction.nextPage;
+    } else if (alPhaY > 0 && alPhaY.abs() > MediaQuery.of(context).size.height/10) {
+      return Direction.previousPage;
+    }
+
+    return Direction.none;
+
+  }
+
+  _handleChange(Direction direction) {
+    switch (direction) {
+      case Direction.nextPage:
+      // print("next Page");
+      this.nextPage();
+      return;
+
+      case Direction.previousPage:
+      // print("previous Page");
+      this.previousPage();
+      return;
+
+      case Direction.nextWord:
+      // print("next word");
+      _pageController.jumpTo(0);
+      widget.nextWord();
+      return;
+
+      case Direction.previousWord:
+      // print("previous word");
+      _pageController.jumpTo(0);
+      widget.previousWord();
+      return;
+
+      default:
+      return;
+    }
   }
 
   void _handleDragStart(ForcePressDetails details) {
-    debugPrint("drag start");
+    // debugPrint("drag start");
+
     double width = MediaQuery.of(context).size.width;
+    startPoint =details.globalPosition;
     double dx = details.globalPosition.dx;
+    double dy = details.globalPosition.dy;
     if (dx < width/2) {
       setState(() {
         prevPoint = details.globalPosition;
@@ -51,16 +143,18 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
   }
 
   void _handleDragUpdate(ForcePressDetails details) {
-    debugPrint("drag update");
+    // debugPrint("drag update");
+
     double dxOffset = details.globalPosition.dx - prevPoint.dx;
     setState(() {
       prevPoint = details.globalPosition;
       controlPoint = Offset(controlPoint.dx + dxOffset, details.globalPosition.dy);
     });
+
   }
 
   void _handleDragEnd(ForcePressDetails details) {
-    debugPrint("drag end");
+    // debugPrint("drag end");
     Offset endPoint;
     Size size = MediaQuery.of(context).size;
     if (dragFromRight) {
@@ -84,12 +178,150 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
       });
     });
     _controller.forward();
+
+    Direction rs =shouldChange(startPoint, controlPoint);
+    _handleChange(rs);
   }
 
-  void _onTap() {
-    debugPrint("tap");
+  Container firstPageView(Word word) {
+
+    content() {
+
+      List<Widget> contentWidgets = [];
+    
+      contentWidgets.add(ElementStyle.definition(word.definitions[0].definition));
+
+      if (word.imageLink ==null) {
+        return 
+            Expanded(
+              flex: 7,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: contentWidgets
+              ),
+            );
+      } else {
+        return 
+            Expanded(
+              flex: 7,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    flex: 6,
+                    child: Container(
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Expanded(
+                    flex: 8,
+                    child: Column(
+                      children: contentWidgets
+                    ),
+                  ),
+                ],
+              )
+            );
+      }
+    }
+
+    return 
+    Container(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.center,
+                child:FittedBox(
+                  child: ElementStyle.word(word.name),
+                  fit: BoxFit.scaleDown,
+                )
+              ),
+            ),
+            Expanded(
+              flex: 0,
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: ElementStyle.pronounce(word.pronounce),
+              ),
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              flex: 0,
+              child: Container(
+                alignment: Alignment.bottomLeft,
+                child: ElementStyle.type_word("*" + word.typeWord + "*"),
+              ),
+            ),
+            SizedBox(height: 10),
+            content()
+            
+          ],
+        ),
+    );
+        
   }
 
+  Container nextPageView(Definition defi, Word word) {
+    List<Widget> contentWidgets = [];
+
+    contentWidgets.add(Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          ElementStyle.smallWord(word.name),
+          ElementStyle.smallTypeWord("*" + word.typeWord + "*")
+        ],
+      ));
+  
+    contentWidgets.add(ElementStyle.definition(defi.definition));
+   defi.examples.forEach((e) {
+
+      contentWidgets.add(SizedBox(height: 5.0));
+      contentWidgets.add(ElementStyle.example(e.example, word.name));
+    });
+    return Container(
+      child: Container(
+        padding: MediaQuery.of(context).padding.add(MediaQuery.of(context).padding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: contentWidgets,
+      ),
+      )
+      
+    );
+  }
+
+  List<Widget> listPages() {
+    List<Widget> listPages = [];
+
+    var word =widget.word;
+    listPages.add(firstPageView(word));
+
+    word.definitions.forEach((def) {
+      listPages.add(nextPageView(def, word));
+    });
+
+
+    return listPages;
+  }
+
+  nextPage() {
+    
+    widget.currentPage =widget.currentPage < widget.numberOfPage - 1 ? widget.currentPage + 1 :widget.numberOfPage - 1;
+    
+    _pageController.jumpToPage(widget.currentPage);
+    
+  }
+
+  previousPage() {
+    widget.currentPage =widget.currentPage > 0 ? widget.currentPage - 1 :0;
+    _pageController.jumpToPage(widget.currentPage);
+  }
+  
   @override
   Widget build(BuildContext context) {
 
@@ -98,53 +330,35 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
       onForcePressUpdate: this._handleDragUpdate,
       onForcePressEnd: this._handleDragEnd,
       child: ClipPath(
-      child: Container(
-        padding: MediaQuery.of(context).padding,
-        color: Appearance.darkSet1.background,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  child: ElementStyle.word("Apple"),
-                ),
-              ),
-              SizedBox(height: 10),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  child: ElementStyle.pronounce('/k\u00e6mp\u0259s/'),
-                ),
-              ),
-              // SizedBox(height: 10),
-              // Expanded(
-              //   flex: 3,
-              //   child: Container(),
-              // ),
-              SizedBox(height: 10),
-              Expanded(
-                flex: 7,
-                child: Column(
+        child: Container(
+          padding: MediaQuery.of(context).padding,
+          color: widget.colorSet.background,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
+            child:Column(
+              children: <Widget>[
+                Container(
+                height: MediaQuery.of(context).padding.top * 2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElementStyle.definition("*apple is a kind of fruit, it is eatable"),
-                    SizedBox(height: 5.0),
-                    ElementStyle.example(" -->This is my apple, i just bought it from school.", "apple"),
-                    SizedBox(height: 25.0),
-                    ElementStyle.definition("*apple is a kind of fruit, it is eatable"),
-                    SizedBox(height: 5.0),
-                    ElementStyle.example(" -->This is my apple, i just bought it from school.", "apple"),
+
+                    ElementStyle.page((widget.currentPage + 1).toString(), widget.numberOfPage.toString())
                   ],
                 ),
-              ),
-            ],
-          ),
-        )
-      ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child:  PageView(
+                    controller: _pageController,
+                    scrollDirection: Axis.vertical,
+                    children: listPages(),
+                  ),
+                )
+              ],
+            )
+          )
+        ),
       clipper: CustomBackground(controlPoint: controlPoint, fromRight: dragFromRight),
     ),
     );

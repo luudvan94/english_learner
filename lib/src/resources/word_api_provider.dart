@@ -5,14 +5,27 @@ import '../models/word.dart';
 import '../common/app_config.dart';
 
 class WordApiProvider {
-  Client client = new Client();
+  Client _client;
 
-  Future<Word> fetchWordList(Client client) async {
+  WordApiProvider(Client client) {
+    this._client =client;
+  }
 
-    final response = await client.get(AppConfig.API_URL);
+  WordApiProvider.defaultProvider() {
+    this._client = new Client();
+  }
 
+  Future<List<Word>> fetchWordList(int topicId) async {
+
+    final response = await _client.get("https://peaceful-anchorage-27502.herokuapp.com/topic/" + topicId.toString());
+    
     if (response.statusCode == 200) {
-      return Word.fromJson(json.decode(response.body));
+      var body =json.decode(response.body);
+      List<Word> wordList = [];
+      for (var item in body) {
+        wordList.add(Word.fromJson(item));
+      }
+      return wordList;
     } else {
       throw Exception('Failed to load word list');
     }

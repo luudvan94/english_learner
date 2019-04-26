@@ -1,6 +1,6 @@
 class Example {
 
-  static final TABLE_WORD = "example";
+  static final TABLE_NAME = "example";
   static final COLUMN_ID = "id";
   static final COLUMN_EXAM = "exam";
   static final COLUMN_DEFI_ID = "defi_id";
@@ -44,5 +44,9 @@ class Example {
 
   int get definitionId {
     return this._definitionId;
+  }
+
+  String get example {
+    return this._exam;
   }
 }
