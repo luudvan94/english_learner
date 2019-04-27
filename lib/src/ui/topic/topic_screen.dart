@@ -4,10 +4,48 @@ import '../../common/element_style.dart';
 import '../../models/topic.dart';
 import '../../blocs/topic_bloc.dart';
 import '../word/word_screen.dart';
+import 'topic_loading.dart';
 
-class TopicScreen extends StatelessWidget {
+class TopicScreen extends StatefulWidget {
+
+@override
+  State<StatefulWidget> createState() {
+    return _TopicScreenState();
+  }
+}
+class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin {
 
   List<Topic> topicList;
+
+  //ANIMATION
+  AnimationController _controller;
+  Animation<double> _animation;
+  Animation _curve;
+
+  @override
+  void initState() {
+    
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(_curve);
+
+    super.initState();
+  }
+
+  _handlerData(List<Topic> topicList) {
+    this.topicList =topicList;
+
+    // _controller.forward();
+
+    // setState(() {
+      
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +56,8 @@ class TopicScreen extends StatelessWidget {
         builder: (context, AsyncSnapshot<List<Topic>> snapshot) {
 
           if (snapshot.hasData) {
-            this.topicList =snapshot.data;
+            this._handlerData(snapshot.data);
+
 
             return Container(
               padding: MediaQuery.of(context).padding,
@@ -27,10 +66,11 @@ class TopicScreen extends StatelessWidget {
             );
           }
 
-          return Center(child: CircularProgressIndicator());
+          return TopicLoading();
         }
        )
     );
+    
     
   }
 

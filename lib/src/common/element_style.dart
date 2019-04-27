@@ -81,8 +81,9 @@ class ElementStyle {
   }
 
   static Text definition(String data) {
+    var definition = data == "" ? "" : "- " + data;
     return Text(
-      "- " + data,
+      definition,
       textAlign: TextAlign.left,
       style: TextStyle(
         color: Appearance.currentSet.definition,

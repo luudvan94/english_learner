@@ -5,6 +5,7 @@ import '../../common/appearance.dart';
 import '../../blocs/word_bloc.dart';
 import '../../models/topic.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'content_loading.dart';
 
 class WordScreen extends StatefulWidget {
 
@@ -18,13 +19,21 @@ class WordScreen extends StatefulWidget {
   }
 }
 
-class _WordScreenState extends State<WordScreen> {
+class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
 
   var colorSets = [Appearance.darkSet1, Appearance.darkSet2];
   int currentIndex = 0;
+  bool playSoundEffect = false;
+  bool animateForth = true;
   bool playable = true;
   List<Word> wordList;
   AudioPlayer _audioPlayer;
+
+  //ANIMATION
+  AnimationController _controller;
+  Animation<double> _animation;
+  Animation<double> _animationBack;
+  Animation _curve;
 
   @override
   void initState() {
@@ -32,7 +41,15 @@ class _WordScreenState extends State<WordScreen> {
 
     _audioPlayer = new AudioPlayer();
 
-    // play("http://english-learner-data-preparation-vl4298.c9users.io/play/audio/learner-dic/beard001.mp3");
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 0.5,
+    ).animate(_curve);
+
   }
 
   _nextWord() {
@@ -60,8 +77,32 @@ class _WordScreenState extends State<WordScreen> {
   }
 
   playCallback() {
+    setState(() {
+      playSoundEffect = true;
+    });
+
+    _animation.addStatusListener((status) {
+      if (status ==AnimationStatus.dismissed) {
+        setState(() {
+          playSoundEffect = false;
+        });
+      }
+
+      if (status ==AnimationStatus.completed) {
+        _controller.reverse();
+        animateForth = false;
+      }  
+    });
+
+    _animation.addListener(() {
+      setState(() {
+        // trigger rebuild 
+      });
+    });
+
+    _controller.forward();
     stop();
-    play("https://english-learner-data-preparation-vl4298.c9users.io/play/audio/learner-dic/" + currentWord.audioLink);
+    play("https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" + currentWord.audioLink);
   }
 
   Future<int> stop() async {
@@ -100,24 +141,43 @@ class _WordScreenState extends State<WordScreen> {
         stream: wordBloc.wordList,
         builder: (context, AsyncSnapshot<List<Word>> snapshot) {
           if (snapshot.hasData) {
-            this.wordList =snapshot.data;
+
+            if (this.wordList == null) {
+              this.wordList =snapshot.data;
+              this.wordList.shuffle();  
+            }
+        
 
             if (playable) {
               playable =false;
-              playCallback();
+              play("https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" + currentWord.audioLink);
             }
-            
 
-            return Stack(
+            if (playSoundEffect) {
+              return Stack(
+                children: <Widget>[
+                  WordContent(word: nextWord, colorSet: this.nextColorSet, nextWord: this._nextWord, previousWord: this._previousWord),
+                  // WordContent(word: this.wordList[0])
+                  WordContent(word: currentWord, colorSet: this.currentColorSet, nextWord: this._nextWord, previousWord: this._previousWord, playSound: this.playCallback),
+                  Opacity(
+                    opacity: _animation.value,
+                    child: Container(color: nextColorSet.background),
+                  )
+                  ], 
+            );
+            } else {
+              return Stack(
                 children: <Widget>[
                   WordContent(word: nextWord, colorSet: this.nextColorSet, nextWord: this._nextWord, previousWord: this._previousWord),
                   // WordContent(word: this.wordList[0])
                   WordContent(word: currentWord, colorSet: this.currentColorSet, nextWord: this._nextWord, previousWord: this._previousWord, playSound: this.playCallback)
                   ], 
             );
+            }
+            
           }
           
-          return Center(child: CircularProgressIndicator());
+          return ContentLoading();
         }
        )
     );
