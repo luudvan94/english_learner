@@ -16,7 +16,7 @@ enum Direction {
 class WordContent extends StatefulWidget {
 
 
-  WordContent({this.word, this.colorSet, this.nextWord, this.previousWord, this.playSound}): currentPage = 0, numberOfPage = word.definitions.length + 1;
+  WordContent({this.word, this.colorSet, this.nextWord, this.previousWord, this.playSound});
 
   final Word word;
   final ColorSet colorSet;
@@ -24,9 +24,6 @@ class WordContent extends StatefulWidget {
   final VoidCallback nextWord;
   final VoidCallback previousWord;
   VoidCallback playSound;
-
-  int currentPage;
-  int numberOfPage;
 
   @override
   State<StatefulWidget> createState() {
@@ -36,10 +33,15 @@ class WordContent extends StatefulWidget {
 
 class _WordContentState extends State<WordContent> with TickerProviderStateMixin {
 
+  // _WordContentState(): currentPage = 0, numberOfPage = widget.word.definitions.length + 1;
+
   Offset controlPoint;
   Offset prevPoint;
   Offset startPoint;
   bool dragFromRight;
+
+  int currentPage;
+  int numberOfPage;
 
   //ANIMATION
   AnimationController _controller;
@@ -57,6 +59,9 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
     dragFromRight = false;
 
     _pageController =PageController(initialPage: 0, keepPage: false);
+
+     currentPage = 0;
+     numberOfPage = widget.word.definitions.length + 1;
   }
 
   Direction shouldChange(Offset startPoint, Offset currentPoint) {
@@ -346,7 +351,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
 
-                    ElementStyle.page((widget.currentPage + 1).toString(), widget.numberOfPage.toString())
+                    ElementStyle.page((currentPage + 1).toString(), (widget.word.definitions.length + 1).toString())
                   ],
                 ),
                 ),
@@ -355,7 +360,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
                   child:  PageView(
                     onPageChanged: (currentPage) {
                       setState(() {
-                        widget.currentPage =currentPage;
+                        this.currentPage =currentPage;
                       });
                     },
                     controller: _pageController,
