@@ -5,15 +5,15 @@ import '../../common/element_style.dart';
 
 class TopicLoading extends StatelessWidget {
 
-  Color base =Color.fromRGBO(0, 25, 33, 1);
-  Color highlight =Color.fromRGBO(0, 43, 54, 1);
+  Color base =Appearance.set2.background;
+  Color highlight =Appearance.set1.background;
 
   @override
   Widget build(BuildContext context) {
 
     return Container(
       padding: MediaQuery.of(context).padding,
-        color: Appearance.currentSet.background,
+        color: Appearance.set1.background,
         child: ListView.builder(
             padding: EdgeInsets.all(10.0),
             itemBuilder: (context, i) {

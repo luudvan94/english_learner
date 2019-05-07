@@ -6,6 +6,7 @@ import '../../blocs/word_bloc.dart';
 import '../../models/topic.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'content_loading.dart';
+import 'package:flutter/services.dart';
 
 class WordScreen extends StatefulWidget {
 
@@ -21,7 +22,7 @@ class WordScreen extends StatefulWidget {
 
 class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
 
-  var colorSets = [Appearance.darkSet1, Appearance.darkSet2];
+  var colorSets = [Appearance.set1, Appearance.set2];
   int currentIndex = 0;
   bool playSoundEffect = false;
   bool animateForth = true;
@@ -49,6 +50,11 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
       begin: 0.0,
       end: 0.5,
     ).animate(_curve);
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
 
   }
 

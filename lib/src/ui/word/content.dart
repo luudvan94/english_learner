@@ -188,7 +188,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
 
       List<Widget> contentWidgets = [];
     
-      contentWidgets.add(ElementStyle.definition(word.definitions[0].definition));
+      contentWidgets.add(ElementStyle.definition(word.definitions[0].definition, false));
 
       if (word.imageLink ==null) {
         return 
@@ -204,6 +204,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
             Expanded(
               flex: 7,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
                     flex: 6,
@@ -275,17 +276,32 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
         ],
       ));
   
-    contentWidgets.add(ElementStyle.definition(defi.definition));
+  if (defi.definition.trim() != "") {
+    contentWidgets.add(ElementStyle.definition(defi.definition, true));
+  }
+  
+  List<Widget> examples = [];
+
+  int exampleCount = 0;
    defi.examples.forEach((e) {
 
-      contentWidgets.add(SizedBox(height: 5.0));
-      contentWidgets.add(ElementStyle.example(e.example, word.name));
+     if (exampleCount > 3) {
+       return;
+     }
+
+      examples.add(SizedBox(height: 5.0));
+      examples.add(ElementStyle.example(e.example, word.name));
+
+      exampleCount += 1;
     });
+
+    contentWidgets.add(new SizedBox(child: new Column(children:examples),));
     return Container(
       child: Container(
-        padding: MediaQuery.of(context).padding.add(MediaQuery.of(context).padding),
+        // alignment: Alignment(1.0, 0.0),
+        padding: MediaQuery.of(context).padding,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: contentWidgets,
       ),

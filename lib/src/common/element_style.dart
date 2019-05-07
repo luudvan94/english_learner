@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'appearance.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ElementStyle {
 
@@ -8,7 +9,7 @@ class ElementStyle {
       data,
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Appearance.currentSet.word,
+        color: Appearance.set1.word,
         decoration: TextDecoration.none,
         fontFamily: 'Verdana'
       ),
@@ -20,7 +21,7 @@ class ElementStyle {
       data,
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Appearance.currentSet.pronounce,
+        color: Appearance.set1.pronounce,
         decoration: TextDecoration.none,
         fontFamily: 'Railway',
         fontSize: 15.0
@@ -33,7 +34,7 @@ class ElementStyle {
       data,
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Appearance.currentSet.pronounce,
+        color: Appearance.set1.pronounce,
         decoration: TextDecoration.none,
         fontFamily: 'Open Sans Condensed',
         fontWeight: FontWeight.bold,
@@ -42,27 +43,24 @@ class ElementStyle {
     );
   }
 
-  static Text example(String data, String keyword) {
+  static AutoSizeText example(String data, String keyword) {
     List<TextSpan> phrases = new List();
     List<String> datas = ("= " + data).toLowerCase().split(keyword);
 
     TextStyle normal = new TextStyle(
-          color: Appearance.currentSet.example,
-          decoration: TextDecoration.none,
-          fontFamily: 'Open Sans Condensed',
-          fontSize: 14.0,
-          fontWeight: FontWeight.w100
+      color: Appearance.set1.example,
+      decoration: TextDecoration.none,
+      fontFamily: 'Open Sans Condensed',
+      fontSize: 14.0,
+      fontWeight: FontWeight.w100
     );
 
     TextStyle highlight = new TextStyle(
-          color: Appearance.currentSet.keyWord,
-          fontWeight: FontWeight.bold,
-          fontSize: 16.0
+      color: Appearance.set1.keyWord,
+      decoration: TextDecoration.none,
+      fontWeight: FontWeight.bold,
+      fontSize: 14.0
     );
-
-    // if (data.toLowerCase().startsWith(keyword.toLowerCase())) {
-    //   phrases.add(new TextSpan(text: keyword, style: highlight));
-    // }
 
     datas.asMap().forEach((i, value) {
       phrases.add(new TextSpan(text: value));
@@ -72,25 +70,29 @@ class ElementStyle {
       }
     });
 
-    return Text.rich(
+    return AutoSizeText.rich(
       TextSpan(
         style:normal,
         children: phrases,
-      )
+      ),
+      maxLines: 2,
+      textAlign:TextAlign.left,
     );
   }
 
-  static Text definition(String data) {
+  static AutoSizeText definition(String data, bool sizeRestraint) {
+    var max =sizeRestraint ? 3 : 10;
     var definition = data == "" ? "" : "- " + data;
-    return Text(
+    return AutoSizeText(
       definition,
+      maxLines: max,
       textAlign: TextAlign.left,
       style: TextStyle(
-        color: Appearance.currentSet.definition,
+        color: Appearance.set1.definition,
         decoration: TextDecoration.none,
         fontFamily: 'Monaco',
-        fontSize: 18.0,
-      ),
+        fontSize: 16.0,
+      )
     );
   }
 
@@ -98,7 +100,7 @@ class ElementStyle {
     return Text(
       data,
       style: TextStyle(
-          color: Appearance.currentSet.word,
+          color: Appearance.set1.word,
           decoration: TextDecoration.none,
           fontFamily: 'Open Sans Condensed',
           fontSize: 16.0,
@@ -112,7 +114,7 @@ class ElementStyle {
       data,
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Appearance.currentSet.pronounce,
+        color: Appearance.set1.pronounce,
         decoration: TextDecoration.none,
         fontFamily: 'Open Sans Condensed',
         fontWeight: FontWeight.bold,
@@ -123,7 +125,7 @@ class ElementStyle {
 
   static Text page(String currentPage, String totalPage) {
     TextStyle currentPageStyle = new TextStyle(
-          color: Appearance.currentSet.currentPage,
+          color: Appearance.set1.currentPage,
           decoration: TextDecoration.none,
           fontFamily: 'Open Sans Condensed',
           fontSize: 20.0,
@@ -131,7 +133,7 @@ class ElementStyle {
     );
 
     TextStyle totalPageStyle = new TextStyle(
-          color: Appearance.currentSet.totalPage,
+          color: Appearance.set1.totalPage,
           decoration: TextDecoration.none,
           fontFamily: 'Open Sans Condensed',
           fontSize: 15.0,
@@ -157,7 +159,7 @@ class ElementStyle {
       topic,
       textAlign: TextAlign.left,
       style: TextStyle(
-        color: Appearance.currentSet.topic,
+        color: Appearance.set1.topic,
         decoration: TextDecoration.none,
         fontFamily: 'Open Sans Condensed',
         fontWeight: FontWeight.bold,
@@ -171,7 +173,7 @@ class ElementStyle {
       description,
       textAlign: TextAlign.left,
       style: TextStyle(
-        color: Appearance.currentSet.description,
+        color: Appearance.set1.description,
           decoration: TextDecoration.none,
           fontFamily: 'Monaco',
           fontSize: 14.0,
@@ -182,10 +184,10 @@ class ElementStyle {
 
   static Text topicListTitle() {
     return Text(
-      "Topic List",
+      "topic list",
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Appearance.currentSet.topicListTitle,
+        color: Appearance.set1.topicListTitle,
           decoration: TextDecoration.none,
           fontFamily: 'Monaco',
           fontSize: 35.0,

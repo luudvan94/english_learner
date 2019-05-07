@@ -5,6 +5,7 @@ import '../../models/topic.dart';
 import '../../blocs/topic_bloc.dart';
 import '../word/word_screen.dart';
 import 'topic_loading.dart';
+import 'package:flutter/services.dart';
 
 class TopicScreen extends StatefulWidget {
 
@@ -24,6 +25,7 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
 
   @override
   void initState() {
+    super.initState();
     
     _controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
@@ -34,7 +36,12 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
       end: 0.0,
     ).animate(_curve);
 
-    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
+
+    
   }
 
   _handlerData(List<Topic> topicList) {
@@ -76,12 +83,12 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
 
   Widget _buildListTopic() {
     return Container(
-      color: Appearance.currentSet.background,
+      color: Appearance.set1.background,
       child: ListView.builder(
       padding: EdgeInsets.all(10.0),
       itemBuilder: (context, i) {
         if (i == 0) {
-
+          
           return Container(
             alignment: Alignment(0.0, 0.0),
             child: ElementStyle.topicListTitle()
@@ -89,8 +96,8 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
         } 
 
         Topic topic =topicList[i - 1];
-        Color color =topic.isDownloaded ? Appearance.currentSet.openButton :Appearance.currentSet.getButton;
-        String title = topic.isDownloaded ? "open" :"get";
+        Color color =Appearance.set1.openButton;
+        String title = "open";
         Text textTitle = Text(title);
         return Container(
           padding: EdgeInsets.fromLTRB(10, 20, 5, 20),
@@ -98,10 +105,10 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             ElementStyle.topic(topic.name),
-            ElementStyle.topicDescription(topic.description),
+            ElementStyle.topicDescription(topic.description.trim().toLowerCase()),
             RaisedButton(
               color: color,
-              textColor: Appearance.currentSet.word,
+              textColor: Appearance.set1.background,
               elevation: 0.0,
               onPressed: () {
                 Navigator.of(context).push(
