@@ -9,8 +9,7 @@ import 'content_loading.dart';
 import 'package:flutter/services.dart';
 
 class WordScreen extends StatefulWidget {
-
-  WordScreen({this.topic}); 
+  WordScreen({this.topic});
 
   final Topic topic;
 
@@ -20,8 +19,7 @@ class WordScreen extends StatefulWidget {
   }
 }
 
-class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
-
+class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin {
   var colorSets = [Appearance.set1, Appearance.set2];
   int currentIndex = 0;
   bool playSoundEffect = false;
@@ -45,7 +43,7 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
     _controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     _curve = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    
+
     _animation = Tween<double>(
       begin: 0.0,
       end: 0.5,
@@ -55,29 +53,27 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
     ]);
-
   }
 
   _nextWord() {
     // stop();
     setState(() {
       playable = true;
-      currentIndex =currentIndex < wordList.length - 1 ? currentIndex + 1 : 0;
+      currentIndex = currentIndex < wordList.length - 1 ? currentIndex + 1 : 0;
     });
-  
   }
 
   _previousWord() {
     // stop();
     setState(() {
       playable = true;
-      currentIndex =currentIndex > 0 ? currentIndex - 1 :wordList.length - 1;
+      currentIndex = currentIndex > 0 ? currentIndex - 1 : wordList.length - 1;
     });
   }
 
   Future<int> play(String url) async {
     debugPrint(url);
-    final result =await _audioPlayer.play(url, isLocal: false);
+    final result = await _audioPlayer.play(url, isLocal: false);
 
     return result;
   }
@@ -88,41 +84,42 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
     });
 
     _animation.addStatusListener((status) {
-      if (status ==AnimationStatus.dismissed) {
+      if (status == AnimationStatus.dismissed) {
         setState(() {
           playSoundEffect = false;
         });
       }
 
-      if (status ==AnimationStatus.completed) {
+      if (status == AnimationStatus.completed) {
         _controller.reverse();
         animateForth = false;
-      }  
+      }
     });
 
     _animation.addListener(() {
       setState(() {
-        // trigger rebuild 
+        // trigger rebuild
       });
     });
 
     _controller.forward();
     stop();
-    play("https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" + currentWord.audioLink);
+    play("https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" +
+        currentWord.audioLink);
   }
 
   Future<int> stop() async {
-    final result =await _audioPlayer.stop();
-    
+    final result = await _audioPlayer.stop();
+
     return result;
   }
+
   Word get nextWord {
-    if (currentIndex ==wordList.length - 1) {
+    if (currentIndex == wordList.length - 1) {
       return wordList[0];
     }
 
     return wordList[currentIndex + 1];
-    
   }
 
   Word get currentWord {
@@ -137,56 +134,73 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin{
     return colorSets[(currentIndex + 1) % 2];
   }
 
-
   @override
   Widget build(BuildContext context) {
-    
     wordBloc.fetchWordList(widget.topic.id);
-    return MaterialApp(
-      home: StreamBuilder(
-        stream: wordBloc.wordList,
-        builder: (context, AsyncSnapshot<List<Word>> snapshot) {
-          if (snapshot.hasData) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: MaterialApp(
+          home: StreamBuilder(
+              stream: wordBloc.wordList,
+              builder: (context, AsyncSnapshot<List<Word>> snapshot) {
+                if (snapshot.hasData) {
+                  if (this.wordList == null) {
+                    this.wordList = snapshot.data;
+                    this.wordList.shuffle();
+                  }
 
-            if (this.wordList == null) {
-              this.wordList =snapshot.data;
-              this.wordList.shuffle();  
-            }
-        
+                  if (playable) {
+                    playable = false;
+                    play(
+                        "https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" +
+                            currentWord.audioLink);
+                  }
 
-            if (playable) {
-              playable =false;
-              play("https://tranquil-meadow-54862.herokuapp.com/play/audio/learner-dic/" + currentWord.audioLink);
-            }
+                  if (playSoundEffect) {
+                    return Stack(
+                      children: <Widget>[
+                        WordContent(
+                            word: nextWord,
+                            colorSet: this.nextColorSet,
+                            nextWord: this._nextWord,
+                            previousWord: this._previousWord),
+                        // WordContent(word: this.wordList[0])
+                        WordContent(
+                            word: currentWord,
+                            colorSet: this.currentColorSet,
+                            nextWord: this._nextWord,
+                            previousWord: this._previousWord,
+                            playSound: this.playCallback),
+                        Opacity(
+                          opacity: _animation.value,
+                          child: Container(color: nextColorSet.background),
+                        )
+                      ],
+                    );
+                  } else {
+                    return Stack(
+                      children: <Widget>[
+                        WordContent(
+                            word: nextWord,
+                            colorSet: this.nextColorSet,
+                            nextWord: this._nextWord,
+                            previousWord: this._previousWord),
+                        // WordContent(word: this.wordList[0])
+                        WordContent(
+                            word: currentWord,
+                            colorSet: this.currentColorSet,
+                            nextWord: this._nextWord,
+                            previousWord: this._previousWord,
+                            playSound: this.playCallback)
+                      ],
+                    );
+                  }
+                }
 
-            if (playSoundEffect) {
-              return Stack(
-                children: <Widget>[
-                  WordContent(word: nextWord, colorSet: this.nextColorSet, nextWord: this._nextWord, previousWord: this._previousWord),
-                  // WordContent(word: this.wordList[0])
-                  WordContent(word: currentWord, colorSet: this.currentColorSet, nextWord: this._nextWord, previousWord: this._previousWord, playSound: this.playCallback),
-                  Opacity(
-                    opacity: _animation.value,
-                    child: Container(color: nextColorSet.background),
-                  )
-                  ], 
-            );
-            } else {
-              return Stack(
-                children: <Widget>[
-                  WordContent(word: nextWord, colorSet: this.nextColorSet, nextWord: this._nextWord, previousWord: this._previousWord),
-                  // WordContent(word: this.wordList[0])
-                  WordContent(word: currentWord, colorSet: this.currentColorSet, nextWord: this._nextWord, previousWord: this._previousWord, playSound: this.playCallback)
-                  ], 
-            );
-            }
-            
-          }
-          
-          return ContentLoading();
-        }
-       )
+                return ContentLoading();
+              })),
     );
   }
 }
-

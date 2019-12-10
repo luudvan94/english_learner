@@ -184,7 +184,7 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
     }
   }
 
-  void _handleLongPress(GestureLongPressDragStartDetails details) {
+  void _handleLongPress(LongPressStartDetails details) {
     widget.playSound();
   }
   Container firstPageView(Word word) {
@@ -333,7 +333,8 @@ class _WordContentState extends State<WordContent> with TickerProviderStateMixin
   Widget build(BuildContext context) {
 
     return GestureDetector(
-      onLongPressDragStart: this._handleLongPress,
+      onLongPressStart: this._handleLongPress,
+      // onLongPressDragStart: this._handleLongPress,
       onPanStart: this._handleDragStart,
       onPanUpdate: this._handleDragUpdate,
       onPanEnd: this._handleDragEnd,

@@ -13,20 +13,20 @@ class Appearance {
   static final lightSet2 = new LightSet2();
 
   static ColorSet get set1 {
-    var currentTime =DateTime.now();
-    debugPrint(currentTime.hour.toString());
-    if (currentTime.hour < 18) {
-      return lightSet1;
-    } 
+    // var currentTime =DateTime.now();
+    // debugPrint(currentTime.hour.toString());
+    // if (currentTime.hour < 18) {
+    //   return lightSet1;
+    // } 
 
     return darkSet1;
   }
 
   static ColorSet get set2 {
-    var currentTime =DateTime.now();
-    if (currentTime.hour < 18) {
-      return lightSet2;
-    } 
+    // var currentTime =DateTime.now();
+    // if (currentTime.hour < 18) {
+    //   return lightSet2;
+    // } 
 
     return darkSet2;
   }
@@ -102,6 +102,7 @@ class DartSet1 implements ColorSet{
 
   Color get background {
     return Color.fromRGBO(0, 43, 54, 1);
+    // return Colors.black;
   }
 
   Color get typeWord {
@@ -162,6 +163,7 @@ class DartSet2 implements ColorSet {
   Color get background {
     // return Color.fromRGBO(0, 25, 33, 1);
     return Color.fromRGBO(0, 11, 19, 1);
+    // return Colors.black;
   }
 
   Color get typeWord {

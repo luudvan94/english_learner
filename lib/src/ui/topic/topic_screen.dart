@@ -8,14 +8,14 @@ import 'topic_loading.dart';
 import 'package:flutter/services.dart';
 
 class TopicScreen extends StatefulWidget {
-
-@override
+  @override
   State<StatefulWidget> createState() {
     return _TopicScreenState();
   }
 }
-class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin {
 
+class _TopicScreenState extends State<TopicScreen>
+    with TickerProviderStateMixin {
   List<Topic> topicList;
 
   //ANIMATION
@@ -26,11 +26,11 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     _curve = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    
+
     _animation = Tween<double>(
       begin: 1.0,
       end: 0.0,
@@ -40,17 +40,15 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
     ]);
-
-    
   }
 
   _handlerData(List<Topic> topicList) {
-    this.topicList =topicList;
+    this.topicList = topicList;
 
     // _controller.forward();
 
     // setState(() {
-      
+
     // });
   }
 
@@ -58,81 +56,70 @@ class _TopicScreenState extends State<TopicScreen> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     topicBloc.fetchTopicList();
     return MaterialApp(
-      home: StreamBuilder(
-        stream: topicBloc.topicList,
-        builder: (context, AsyncSnapshot<List<Topic>> snapshot) {
+        home: SafeArea(
+            top: false,
+            bottom: false,
+            child: StreamBuilder(
+                stream: topicBloc.topicList,
+                builder: (context, AsyncSnapshot<List<Topic>> snapshot) {
+                  if (snapshot.hasData) {
+                    this._handlerData(snapshot.data);
 
-          if (snapshot.hasData) {
-            this._handlerData(snapshot.data);
+                    return Container(
+                      // padding: MediaQuery.of(context).padding,
+                      child: _buildListTopic(),
+                      // color: Colors.white,
+                    );
+                  }
 
-
-            return Container(
-              padding: MediaQuery.of(context).padding,
-              child: _buildListTopic(),
-              // color: Colors.white,
-            );
-          }
-
-          return TopicLoading();
-        }
-       )
-    );
-    
-    
+                  return TopicLoading();
+                })));
   }
 
   Widget _buildListTopic() {
-    return Container(
+    return  Container(
       color: Appearance.set1.background,
-      child: ListView.builder(
-      padding: EdgeInsets.all(10.0),
-      itemBuilder: (context, i) {
-        if (i == 0) {
-          
-          return Container(
-            alignment: Alignment(0.0, 0.0),
-            child: ElementStyle.topicListTitle()
-          );
-        } 
+      child: SafeArea(child: ListView.builder(
+        padding: EdgeInsets.all(10.0),
+        itemBuilder: (context, i) {
+          if (i == 0) {
+            return Container(
+                alignment: Alignment(0.0, 0.0),
+                child: ElementStyle.topicListTitle());
+          }
 
-        Topic topic =topicList[i - 1];
-        Color color =Appearance.set1.openButton;
-        String title = "open";
-        Text textTitle = Text(title);
-        return Container(
-          padding: EdgeInsets.fromLTRB(10, 20, 5, 20),
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ElementStyle.topic(topic.name),
-            ElementStyle.topicDescription(topic.description.trim().toLowerCase()),
-            RaisedButton(
-              color: color,
-              textColor: Appearance.set1.background,
-              elevation: 0.0,
-              onPressed: () {
-                Navigator.of(context).push(
-                  new MaterialPageRoute(
-                    builder: (context) => new WordScreen(topic: topic,)
-                  )
-                );
-              },
-              child: textTitle,
-            ),
-            
-          ],
-        )
-        );
-         
-      },
-      itemCount: topicList.length + 1,
-    ),
+          Topic topic = topicList[i - 1];
+          Color color = Appearance.set1.openButton;
+          String title = "open";
+          return Container(
+              padding: EdgeInsets.fromLTRB(10, 20, 5, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ElementStyle.topic(topic.name),
+                  ElementStyle.topicDescription(
+                      topic.description.trim().toLowerCase()),
+                  RaisedButton(
+                    color: color,
+                    textColor: Appearance.set1.background,
+                    elevation: 0.0,
+                    onPressed: () {
+                      Navigator.of(context).push(new MaterialPageRoute(
+                          builder: (context) => new WordScreen(
+                                topic: topic,
+                              )));
+                    },
+                    child: ElementStyle.openTitle(),
+                  ),
+                ],
+              ));
+        },
+        itemCount: topicList.length + 1,
+      )),
     );
-    
   }
 
   _handleTopicGet(Topic topic, BuildContext context) {
-   
     // debugPrint(topic.name)
   }
 }

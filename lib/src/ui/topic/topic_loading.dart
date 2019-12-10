@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../common/appearance.dart';
 import '../../common/element_style.dart';
+import '../../common/constant.dart';
 
 class TopicLoading extends StatelessWidget {
 
@@ -55,7 +56,7 @@ class TopicLoading extends StatelessWidget {
                           color: highlight 
                         ),
                         // color: Colors.white,
-                        width: 300.0,
+                        width: Constant.screenWidth(context) - 20,
                         height: 15.0,
                       ),
                 ),
