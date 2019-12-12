@@ -25,16 +25,16 @@ dependencies:
   cupertino_icons: ^0.1.2
   rxdart: ^0.18.0
   http: ^0.12.0+1
-  sqflite: ^1.1.0
   path_provider: ^0.5.0+1
   audioplayers: ^0.11.0
   shimmer: ^1.0.0
   auto_size_text: ^1.1.2
 
 dev_dependencies:
-  flutter_test:
+  screenshots: ^2.1.1
+  flutter_driver:
     sdk: flutter
-  mockito: 4.0.0
+  test: any
 
 
 # For information on the generic Dart part of this file, see the
@@ -70,9 +70,8 @@ flutter:
         - asset: fonts/Raleway-Thin.ttf
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
+  assets:
+   - images/menu.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

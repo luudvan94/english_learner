@@ -10,7 +10,8 @@ class ElementStyle {
       style: TextStyle(
           color: Appearance.set1.word,
           decoration: TextDecoration.none,
-          fontFamily: 'Verdana'),
+          fontFamily: 'Verdana',
+          fontSize: 35.0),
     );
   }
 
@@ -21,7 +22,7 @@ class ElementStyle {
       style: TextStyle(
           color: Appearance.set1.pronounce,
           decoration: TextDecoration.none,
-          fontFamily: 'Railway',
+          fontFamily: 'Verdana',
           fontSize: 17.0),
     );
   }
@@ -174,9 +175,10 @@ class ElementStyle {
     );
   }
 
-  static Text openTitle() {
+  static Text openTitle(key) {
     return Text(
       "open",
+      key: Key(key),
       textAlign: TextAlign.left,
       style: TextStyle(
           color: Colors.white,

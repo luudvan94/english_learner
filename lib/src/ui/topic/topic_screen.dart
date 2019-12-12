@@ -56,6 +56,7 @@ class _TopicScreenState extends State<TopicScreen>
   Widget build(BuildContext context) {
     topicBloc.fetchTopicList();
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
         home: SafeArea(
             top: false,
             bottom: false,
@@ -109,7 +110,7 @@ class _TopicScreenState extends State<TopicScreen>
                                 topic: topic,
                               )));
                     },
-                    child: ElementStyle.openTitle(),
+                    child: ElementStyle.openTitle(topic.name),
                   ),
                 ],
               ));

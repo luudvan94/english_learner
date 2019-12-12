@@ -141,8 +141,8 @@ class _WordScreenState extends State<WordScreen> with TickerProviderStateMixin {
       onWillPop: () async {
         return false;
       },
-      child: MaterialApp(
-          home: StreamBuilder(
+      child: Scaffold(
+          body: StreamBuilder(
               stream: wordBloc.wordList,
               builder: (context, AsyncSnapshot<List<Word>> snapshot) {
                 if (snapshot.hasData) {
