@@ -9,4 +9,4 @@ Flutter project aiming for english learner
 ![Word Detail](https://media.giphy.com/media/dzV7GsXXhfS1zzG7RL/giphy.gif)
 
 ## Youtube
-![Youtube](https://www.youtube.com/watch?v=l6CQ0pN3TCI)
+https://www.youtube.com/watch?v=l6CQ0pN3TCI
